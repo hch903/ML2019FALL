@@ -17,7 +17,12 @@ class Resnet18(nn.Module):
     def __init__(self):
         super(Resnet18, self).__init__()
         self.resnet = nn.Sequential(*list(models.resnet18(pretrained=True).children())[:-1])
-        self.fc = nn.Linear(512,7)
+        self.fc = nn.Sequential(
+            nn.Linear(512, 512),
+            nn.ReLU(),
+            nn.BatchNorm1d(512),
+            nn.Linear(512, 7)
+        )
     def forward(self, x):
         x = self.resnet(x)
         x = x.view(-1, 1*1*512)
@@ -44,6 +49,7 @@ if __name__ == '__main__':
     torch.cuda.set_device(0)
     
     test_set = sorted(glob.glob(os.path.join(sys.argv[1], '*.jpg')))
+    # test_set = sorted(glob.glob(os.path.join('test_img/', '*.jpg')))
 
     transform = transforms.Compose([
     transforms.ToTensor(),
@@ -71,6 +77,7 @@ if __name__ == '__main__':
             prediction += predict.tolist()
 
     ans_file = open(sys.argv[2], "w")
+    # ans_file = open('result.csv', "w")
     writer = csv.writer(ans_file)
     title = ['id','label']
     writer.writerow(title) 

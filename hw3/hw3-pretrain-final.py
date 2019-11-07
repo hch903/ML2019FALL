@@ -21,8 +21,8 @@ def load_data(img_path, label_path):
     train_data = list(zip(train_image, train_label))
     random.shuffle(train_data)
     
-    train_set = train_data[:28000]
-    valid_set = train_data[28000:]
+    train_set = train_data[:28500]
+    valid_set = train_data[28500:]
 
     return train_set, valid_set
 
@@ -45,7 +45,12 @@ class Resnet18(nn.Module):
     def __init__(self):
         super(Resnet18, self).__init__()
         self.resnet = nn.Sequential(*list(models.resnet18(pretrained=True).children())[:-1])
-        self.fc = nn.Linear(512,7)
+        self.fc = nn.Sequential(
+            nn.Linear(512, 512),
+            nn.ReLU(),
+            nn.BatchNorm1d(512),
+            nn.Linear(512, 7)
+        )
     def forward(self, x):
         x = self.resnet(x)
         x = x.view(-1, 1*1*512)
@@ -102,7 +107,6 @@ if __name__ == '__main__':
 
         model.eval()
         with torch.no_grad():
-            class_names = np.array(["Angry", "Disgust", "Fear", "Happy", "Sad", "Suprise", "Neutral"])
             valid_loss = []
             valid_acc = []
             y_true = []
