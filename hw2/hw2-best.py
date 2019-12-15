@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 import csv
 import sys
-
+import tensorflow as tf
 from sklearn import preprocessing
 import keras
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 
 def normalize_data(x, normalize_column):
     x = x.astype(np.float64)
